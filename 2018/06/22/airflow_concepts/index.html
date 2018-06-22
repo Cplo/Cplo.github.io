@@ -6,15 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://cplo.github.io">
-  <title>Archives: 2018 | Pengc的博客</title>
+  <title>Airflow概念 | Pengc的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Pengc的博客">
-<meta property="og:url" content="https://cplo.github.io/archives/2018/index.html">
+  <meta name="description" content="触发器规则虽然正常的工作流是在任务的所有直接上游任务都成功时触发任务，但Airflow允许进行更复杂的依赖关系设置。  所有的operators都有一个trigger_rule参数，它定义了生成的任务被触发的规则。 trigger_rule参数的默认值是all_success，定义为“当所有直接上游任务成功执行完成时触发此任务”。这里描述的所有其他规则都基于直接的父任务，并且这些值可以在创建任务时">
+<meta name="keywords" content="airflow,翻译">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Airflow概念">
+<meta property="og:url" content="https://cplo.github.io/2018/06/22/airflow_concepts/index.html">
 <meta property="og:site_name" content="Pengc的博客">
+<meta property="og:description" content="触发器规则虽然正常的工作流是在任务的所有直接上游任务都成功时触发任务，但Airflow允许进行更复杂的依赖关系设置。  所有的operators都有一个trigger_rule参数，它定义了生成的任务被触发的规则。 trigger_rule参数的默认值是all_success，定义为“当所有直接上游任务成功执行完成时触发此任务”。这里描述的所有其他规则都基于直接的父任务，并且这些值可以在创建任务时">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="https://airflow.apache.org/_images/latest_only_with_trigger.png">
+<meta property="og:updated_time" content="2018-06-22T05:32:52.627Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Pengc的博客">
+<meta name="twitter:title" content="Airflow概念">
+<meta name="twitter:description" content="触发器规则虽然正常的工作流是在任务的所有直接上游任务都成功时触发任务，但Airflow允许进行更复杂的依赖关系设置。  所有的operators都有一个trigger_rule参数，它定义了生成的任务被触发的规则。 trigger_rule参数的默认值是all_success，定义为“当所有直接上游任务成功执行完成时触发此任务”。这里描述的所有其他规则都基于直接的父任务，并且这些值可以在创建任务时">
+<meta name="twitter:image" content="https://airflow.apache.org/_images/latest_only_with_trigger.png">
   
     <link rel="alternative" href="/atom.xml" title="Pengc的博客" type="application/atom+xml">
   
@@ -144,36 +151,74 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-airflow_concepts" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/06/22/airflow_concepts/" class="archive-article-date">
-  	<time datetime="2018-06-22T05:32:52.627Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-06-22</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/06/22/airflow_concepts/">Airflow概念</a>
+    <h1 class="article-title" itemprop="name">
+      Airflow概念
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2018/06/22/airflow_concepts/" class="archive-article-date">
+  	<time datetime="2018-06-22T05:32:52.627Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-06-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="触发器规则"><a href="#触发器规则" class="headerlink" title="触发器规则"></a>触发器规则</h3><p>虽然正常的工作流是在任务的所有直接上游任务都成功时触发任务，但Airflow允许进行更复杂的依赖关系设置。 </p>
+<p>所有的operators都有一个<strong><em>trigger_rule</em></strong>参数，它定义了生成的任务被触发的规则。 trigger_rule参数的默认值是all_success，定义为“当所有直接上游任务成功执行完成时触发此任务”。这里描述的所有其他规则都基于直接的父任务，并且这些值可以在创建任务时传递给任何operator：</p>
+<ul>
+<li>all_success: 所有父任务被成功执行（默认）</li>
+<li>all_failed：所有父任务处于failed 或者 upstream_failed 状态</li>
+<li>all_done：所有的父任务都完成了他们的执行</li>
+<li>one_failed：当至少有一位父任务失败后会触发，不会等待所有父任务完成</li>
+<li>one_success：当至少有一位父任务成功后会触发，并不等待所有的父任务完成</li>
+<li>dummy：依赖关系仅用于显示，随意触发</li>
+</ul>
+<p>请注意，这些可以与depends_on_past（boolean）一起使用，当设置为True时，如果任务的上一个schedule计划未成功，则会阻止任务被触发。</p>
+<h3 id="仅运行最新的schedule"><a href="#仅运行最新的schedule" class="headerlink" title="仅运行最新的schedule"></a>仅运行最新的schedule</h3><p>标准工作流程行为针对特定日期/时间范围运行一系列任务。但是，某些工作流执行独立于运行时间的任务，但需要按计划运行，与标准cron作业非常相似。这些情况下，在暂停期间回填或运行未命中的作业只会浪费CPU周期。</p>
+<p>对于这种情况，您可以使用LatestOnlyOperator跳过在DAG的不在最近一次计划运行期间运行的任务。如果现在的时间不在其执行时间和下一个计划的执行时间之间，LatestOnlyOperator将跳过所有即时下游任务及其本身。</p>
+<p>必须注意跳过的任务和触发规则之间的交互。任务跳过将传递通过这些触发规则：all_success和all_failed，all_done，one_failed，one_success和dummy不传递。如果您想使用带有不会传递跳转的触发器规则的LatestOnlyOperator，则需要确保LatestOnlyOperator直接位于您要跳过的任务的上游。</p>
+<p>通过使用触发规则可以混合以典型的日期/时间依赖模式运行的任务和使用LatestOnlyOperator的任务。</p>
+<p>例如，请考虑以下dag：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#dags/latest_only_with_trigger.py</span><br><span class="line">import datetime as dt</span><br><span class="line"></span><br><span class="line">from airflow.models import DAG</span><br><span class="line">from airflow.operators.dummy_operator import DummyOperator</span><br><span class="line">from airflow.operators.latest_only_operator import LatestOnlyOperator</span><br><span class="line">from airflow.utils.trigger_rule import TriggerRule</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dag = DAG(</span><br><span class="line">    dag_id=&apos;latest_only_with_trigger&apos;,</span><br><span class="line">    schedule_interval=dt.timedelta(hours=4),</span><br><span class="line">    start_date=dt.datetime(2016, 9, 20),</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">latest_only = LatestOnlyOperator(task_id=&apos;latest_only&apos;, dag=dag)</span><br><span class="line"></span><br><span class="line">task1 = DummyOperator(task_id=&apos;task1&apos;, dag=dag)</span><br><span class="line">task1.set_upstream(latest_only)</span><br><span class="line"></span><br><span class="line">task2 = DummyOperator(task_id=&apos;task2&apos;, dag=dag)</span><br><span class="line"></span><br><span class="line">task3 = DummyOperator(task_id=&apos;task3&apos;, dag=dag)</span><br><span class="line">task3.set_upstream([task1, task2])</span><br><span class="line"></span><br><span class="line">task4 = DummyOperator(task_id=&apos;task4&apos;, dag=dag,</span><br><span class="line">                      trigger_rule=TriggerRule.ALL_DONE)</span><br><span class="line">task4.set_upstream([task1, task2])</span><br></pre></td></tr></table></figure></p>
+<p>在这个dag的情况下，latest_only任务将把除最近运行以外的所有运行显示为跳过的状态。 task1直接位于latest_only的下游，并且也会跳过除最新版本之外的所有运行。 task2完全独立于latest_only，并将在所有预定时段运行。 task3位于task1和task2的下游，并且由于默认的trigger_rule为all_success，因此将从task1接收传递跳过。 task4位于task1和task2的下游，但由于其trigger_rule设置为all_done，只要task1被跳过（一个有效的完成状态）并且task2成功，它就会立即触发。</p>
+<p><img src="https://airflow.apache.org/_images/latest_only_with_trigger.png" alt="image"></p>
+<p><a href="https://airflow.apache.org/concepts.html" target="_blank" rel="noopener">原文链接</a></p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -189,57 +234,106 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=https://cplo.github.io/2018/06/22/airflow_concepts/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/06/10/hello-world/" class="archive-article-date">
-  	<time datetime="2018-06-10T10:59:25.799Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-06-10</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2018/06/10/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Hello World</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/06/10/hello-world/">Hello World</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">hello</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -262,8 +356,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
