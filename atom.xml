@@ -95,9 +95,9 @@
       <category term="Monitor" scheme="https://cplo.github.io/categories/Monitor/"/>
     
     
-      <category term="翻译" scheme="https://cplo.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
-    
       <category term="monitor" scheme="https://cplo.github.io/tags/monitor/"/>
+    
+      <category term="翻译" scheme="https://cplo.github.io/tags/%E7%BF%BB%E8%AF%91/"/>
     
       <category term="tsdb" scheme="https://cplo.github.io/tags/tsdb/"/>
     
