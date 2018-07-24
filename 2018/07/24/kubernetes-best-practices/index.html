@@ -29,7 +29,7 @@
 <meta property="og:site_name" content="Pengc的博客">
 <meta property="og:description" content="Google工程师总结Containers 容器应该是短暂的。 使用.dockerignore文件 使用multi-stage来构建（17.05版本以上的特性） 避免安装不必要的包 每个容器只关心一件事情 最小化镜像层数 对多行参数排序 构建缓存 不要轻易信任base image 用小的base image 使用建造者模式（设计模式的一种）  容器中 容器中使用非root用户 文件系统只读 一个进">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-07-24T08:28:44.089Z">
+<meta property="og:updated_time" content="2018-07-24T08:32:13.516Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Kubernetes最佳实践">
 <meta name="twitter:description" content="Google工程师总结Containers 容器应该是短暂的。 使用.dockerignore文件 使用multi-stage来构建（17.05版本以上的特性） 避免安装不必要的包 每个容器只关心一件事情 最小化镜像层数 对多行参数排序 构建缓存 不要轻易信任base image 用小的base image 使用建造者模式（设计模式的一种）  容器中 容器中使用非root用户 文件系统只读 一个进">
@@ -167,7 +167,7 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Google工程师总结"><span class="post-toc-text">Google工程师总结</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Containers"><span class="post-toc-text">Containers</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#容器中"><span class="post-toc-text">容器中</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Deployment"><span class="post-toc-text">Deployment</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#安全"><span class="post-toc-text">安全</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Services"><span class="post-toc-text">Services</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Application-architecture"><span class="post-toc-text">Application architecture</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#集群管理"><span class="post-toc-text">集群管理</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#监控和日志"><span class="post-toc-text">监控和日志</span></a></li></ol></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Google工程师总结"><span class="post-toc-text">Google工程师总结</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Containers"><span class="post-toc-text">Containers</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#容器中"><span class="post-toc-text">容器中</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Deployment"><span class="post-toc-text">Deployment</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#安全"><span class="post-toc-text">安全</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Services"><span class="post-toc-text">Services</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Application-architecture"><span class="post-toc-text">Application architecture</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#集群管理"><span class="post-toc-text">集群管理</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#监控和日志"><span class="post-toc-text">监控和日志</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#参考"><span class="post-toc-text">参考</span></a></li></ol>
         </nav>
     </aside>
 
@@ -269,8 +269,7 @@
 <li>使用Google Stackdriver Logging获取日志</li>
 <li>通过kibana看elasticsearch日志</li>
 </ul>
-<p>参考   </p>
-<ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
 <li><a href="https://medium.com/@sachin.arote1/kubernetes-best-practices-9b1435a4cb53" target="_blank" rel="noopener">Google Kubernetes Best Practices</a>  </li>
 <li><a href="https://speakerdeck.com/thesandlord/kubernetes-best-practices" target="_blank" rel="noopener">Slide</a></li>
 <li><a href="http://blog.kubernetes.io/2016/08/security-best-practices-kubernetes-deployment.html" target="_blank" rel="noopener">http://blog.kubernetes.io/2016/08/security-best-practices-kubernetes-deployment.html</a></li>
@@ -288,7 +287,7 @@
     <div class="content">
         
 <span class="post-time">
-    Last updated: <time datetime="2018-07-24T08:28:44.089Z" itemprop="dateUpdated">2018-07-24 16:28:44</time>
+    Last updated: <time datetime="2018-07-24T08:32:13.516Z" itemprop="dateUpdated">2018-07-24 16:32:13</time>
 </span><br>
 
 
