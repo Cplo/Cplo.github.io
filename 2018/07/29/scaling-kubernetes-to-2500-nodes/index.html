@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>拓展Kubernetes集群规模到2500节点 | Pengc的博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="翻译,kubernetes">
+    <meta name="description" content="原文链接：https://blog.openai.com/scaling-kubernetes-to-2500-nodes/ 我们已经用Kubernetes做深度学习研究两年了。尽管我们最大规模的负载是管理裸云虚拟机，但Kubernetes提供了更快的迭代周期、合理的可拓展性使得其成为实验的理想选择。现在我们管理几个Kubernetes集群（一些在云上一些在物理机上），最大的集群已经2500个节点">
+<meta name="keywords" content="翻译,kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="拓展Kubernetes集群规模到2500节点">
+<meta property="og:url" content="https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/index.html">
+<meta property="og:site_name" content="Pengc的博客">
+<meta property="og:description" content="原文链接：https://blog.openai.com/scaling-kubernetes-to-2500-nodes/ 我们已经用Kubernetes做深度学习研究两年了。尽管我们最大规模的负载是管理裸云虚拟机，但Kubernetes提供了更快的迭代周期、合理的可拓展性使得其成为实验的理想选择。现在我们管理几个Kubernetes集群（一些在云上一些在物理机上），最大的集群已经2500个节点">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://note.youdao.com/yws/public/resource/59eab83614af4d1cefd08c4d3a9f9ddc/xmlnote/WEBRESOURCE9764bed05d7cfc52b2938526d06c2010/5878">
+<meta property="og:image" content="https://note.youdao.com/yws/public/resource/59eab83614af4d1cefd08c4d3a9f9ddc/xmlnote/WEBRESOURCE289b4d64aa7de72b2475a4f351b9e4e4/5888">
+<meta property="og:updated_time" content="2018-07-29T15:26:30.263Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="拓展Kubernetes集群规模到2500节点">
+<meta name="twitter:description" content="原文链接：https://blog.openai.com/scaling-kubernetes-to-2500-nodes/ 我们已经用Kubernetes做深度学习研究两年了。尽管我们最大规模的负载是管理裸云虚拟机，但Kubernetes提供了更快的迭代周期、合理的可拓展性使得其成为实验的理想选择。现在我们管理几个Kubernetes集群（一些在云上一些在物理机上），最大的集群已经2500个节点">
+<meta name="twitter:image" content="https://note.youdao.com/yws/public/resource/59eab83614af4d1cefd08c4d3a9f9ddc/xmlnote/WEBRESOURCE9764bed05d7cfc52b2938526d06c2010/5878">
+    
+        <link rel="alternate" type="application/atom+xml" title="Pengc的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/assets/images/tuantuan.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Pengc</h5>
+          <a href="mailto:dev_chenpeng@163.com" title="dev_chenpeng@163.com" class="mail">dev_chenpeng@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Cplo" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-link"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">拓展Kubernetes集群规模到2500节点</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="検索">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">拓展Kubernetes集群规模到2500节点</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-07-29T15:22:18.000Z" itemprop="datePublished" class="page-time">
+  2018-07-29
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Kubernetes/">Kubernetes</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#etcd"><span class="post-toc-text">etcd</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Kube-masters"><span class="post-toc-text">Kube masters</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Docker-image-pulls"><span class="post-toc-text">Docker image pulls</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Networking"><span class="post-toc-text">Networking</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ARP-Cache"><span class="post-toc-text">ARP Cache</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-scaling-kubernetes-to-2500-nodes"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">拓展Kubernetes集群规模到2500节点</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-07-29 23:22:18" datetime="2018-07-29T15:22:18.000Z"  itemprop="datePublished">2018-07-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Kubernetes/">Kubernetes</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>原文链接：<a href="https://blog.openai.com/scaling-kubernetes-to-2500-nodes/" target="_blank" rel="noopener">https://blog.openai.com/scaling-kubernetes-to-2500-nodes/</a></p>
+<p>我们已经用Kubernetes做深度学习研究两年了。尽管我们最大规模的负载是管理裸云虚拟机，但Kubernetes提供了更快的迭代周期、合理的可拓展性使得其成为实验的理想选择。现在我们管理几个Kubernetes集群（一些在云上一些在物理机上），最大的集群已经2500个节点。这个集群运行在Azure的D15v2和NC24型号的虚拟机中。<br>在这种规模下，许多系统组件遇到了问题，如etcd、k8s masters、docker image pull、网络、kubedns甚至机器的arp缓存。这里分享下我们遇到的问题和解决办法。</p>
+<h2 id="etcd"><a href="#etcd" class="headerlink" title="etcd"></a>etcd</h2><p>在我们节点规模达到500后，kubectl命令操作会出现超时的现象，通过增加k8s master节点（kube-apiserver运行在虚拟机中）暂时解决了该问题，但治标不治本。</p>
+<p>这使得我们强烈怀疑etcd集群，它是k8s master的中央存储。通过监控发现，尽管每台机器使用有着5000的iops性能的P30 SSD，但我们看到etcd副本的写入时延仍达到几百毫秒。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://note.youdao.com/yws/public/resource/59eab83614af4d1cefd08c4d3a9f9ddc/xmlnote/WEBRESOURCE9764bed05d7cfc52b2938526d06c2010/5878" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>这个时延正在阻碍我们的集群的正常运转。</p>
+<p>使用fio对性能进行基准测试，我们看到etcd只能使用大约10％的可用IOPS，因为写入延迟为2ms，而etcd执行顺序I/O，使其具有延迟限制。</p>
+<p>然后，我们将每个节点的etcd目录移动到<strong>本地临时磁盘</strong>，该磁盘是直接连接到实例的SSD而不是网络连接的。切换到本地磁盘会使写入延迟达到200us，而etcd变得健康！</p>
+<p>我们的集群运行良好，直到集群规模到大约1,000个节点，此时我们再次看到来自etcd的高提交延迟。这一次，我们注意到kube-apiservers从etcd读取的速度超过500MB / s。我们设置Prometheus来监控apiservers，并设置–audit-log-path和–audit-log-maxbackup标志以启用更多的apiserver日志记录。发现许多慢查询和对list api for Events的过度调用。</p>
+<p>根本原因是Fluentd和Datadog监控过程的默认设置是从集群中的每个节点查询apiservers（例如，此问题现已修复）。我们只是简单地改变了这些流程，使其轮询降低频率，发现apiservers的负载再次变得稳定。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://note.youdao.com/yws/public/resource/59eab83614af4d1cefd08c4d3a9f9ddc/xmlnote/WEBRESOURCE289b4d64aa7de72b2475a4f351b9e4e4/5888" alt="image" title="">
+                </div>
+                <div class="image-caption">image</div>
+            </figure>
+<p>etcd出口从500MB/s+下降到几乎为0（上图中的负数表示出口）</p>
+<p>另一个有用的调整是将Kubernetes事件存储在一个单独的etcd集群中，因此事件创建中的峰值不会影响主要etcd实例的性能。为此，我们只需将–etcd-servers-overrides标志设置为以下内容：–etcd-servers-overrides=/events#<a href="https://0.example.com:2381;https://1.example.com:2381;https://2.example.com:2381" target="_blank" rel="noopener">https://0.example.com:2381;https://1.example.com:2381;https://2.example.com:2381</a></p>
+<p>另一个是1000个节点会发生的故障是达到了etcd的硬存储限制（默认为2GB），这导致它停止接受写入。这引发了级联故障：我们所有的Kube节点都未通过运行状况检查，我们的自动定标器因此决定终止所有工作节点。我们使用–quota-backend-bytes标志增加了最大etcd大小，并且autoscaler现在有一个健全性检查，如果它将终止超过50％的集群节点，则不采取行动。</p>
+<h2 id="Kube-masters"><a href="#Kube-masters" class="headerlink" title="Kube masters"></a>Kube masters</h2><p>我们在同一台机器上配置kube-apiserver，kube-controller-manager和kube-scheduler进程。为了获得高可用性，我们总是至少有2个主服务器，并将–apiserver-count标志设置为我们正在运行的服务器数量（否则Prometheus监控可能会在实例之间混淆）。</p>
+<p>我们主要使用Kubernetes作为批处理调度系统，并依靠我们的autoscaler来动态扩展我们的集群 - 这使我们可以显着降低空闲节点的成本，同时在快速迭代的同时仍然提供低延迟。默认的kube-scheduler策略是在节点之间均匀分布负载，但我们希望相反，以便终止未使用的节点，并且还可以快速调度大型pod。所以我们切换到以下策略：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">&quot;kind&quot; : &quot;Policy&quot;,</span><br><span class="line">&quot;apiVersion&quot; : &quot;v1&quot;,</span><br><span class="line">&quot;predicates&quot; : [</span><br><span class="line">  &#123;&quot;name&quot; : &quot;GeneralPredicates&quot;&#125;,</span><br><span class="line">  &#123;&quot;name&quot; : &quot;MatchInterPodAffinity&quot;&#125;,</span><br><span class="line">  &#123;&quot;name&quot; : &quot;NoDiskConflict&quot;&#125;,</span><br><span class="line">  &#123;&quot;name&quot; : &quot;NoVolumeZoneConflict&quot;&#125;,</span><br><span class="line">  &#123;&quot;name&quot; : &quot;PodToleratesNodeTaints&quot;&#125;</span><br><span class="line">  ],</span><br><span class="line">&quot;priorities&quot; : [</span><br><span class="line">  &#123;&quot;name&quot; : &quot;MostRequestedPriority&quot;, &quot;weight&quot; : 1&#125;,</span><br><span class="line">  &#123;&quot;name&quot; : &quot;InterPodAffinityPriority&quot;, &quot;weight&quot; : 2&#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们广泛使用KubeDNS进行服务发现，但在推出新的调度策略后不久，它开始出现可靠性问题。我们发现故障只发生在KubeDNS的某些pod上。使用新的调度策略，一些机器最终运行了10多个KubeDNS副本，创建了热点，并且我们已经超过了允许的从每个Azure VM进行外部域查找的~200QPS。</p>
+<p>我们通过向KubeDNS pod添加反关联性规则来解决此问题：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">affinity:</span><br><span class="line"> podAntiAffinity:</span><br><span class="line">   requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">   - weight: 100</span><br><span class="line">     labelSelector:</span><br><span class="line">       matchExpressions:</span><br><span class="line">       - key: k8s-app</span><br><span class="line">         operator: In</span><br><span class="line">         values:</span><br><span class="line">         - kube-dns</span><br><span class="line">     topologyKey: kubernetes.io/hostname</span><br></pre></td></tr></table></figure></p>
+<h2 id="Docker-image-pulls"><a href="#Docker-image-pulls" class="headerlink" title="Docker image pulls"></a>Docker image pulls</h2><p>我们的Dota项目始于Kubernetes，随着它的扩展，我们注意到新鲜的Kubernetes节点通常有待放置待定很长时间。游戏图像大约为17GB，并且通常需要30分钟才能启动一个新的群集节点，因此我们理解为什么Dota容器将pending一段时间 - 但对于其他容器也是如此。挖掘，我们发现kubelet有一个–serialize-image-pulls标志，默认为true，这意味着Dota image pull阻止了所有其他image。更改为false需要将Docker切换为overlay2而不是AUFS。为了进一步加快拉动速度，我们还将Docker根目录移到了有SSD的实例，就像我们为etcd机器所做的那样。</p>
+<p>即使在优化拉速后，我们也看到pod无法启动时出现错误信息：rpc error：code = 2 desc = net / http：request cancelled。由于缺乏进度，kubelet和Docker日志还包含指示image拉取已被取消的消息。我们跟踪根部到大image需要太长时间来拉取，或者我们有大量积压的image来拉动。为了解决这个问题，我们将kubelet的–image-pull-progress-deadline标志设置为30分钟，并将Docker守护程序的max-concurrent-downloads选项设置为10.（第二个选项不会加速提取大image，但是允许image队列并行拉动。）</p>
+<p>我们上次的Docker pull问题是由于Google Container Registry。默认情况下，kubelet从gcr.io（由-pod-infra-container-image标志控制）中提取pause image，该image在启动任何新容器时使用。如果由于任何原因（如超出配额）而导致拉动失败，则该节点将无法启动任何容器。因为我们的节点通过NAT到达gcr.io而不是拥有自己的公共IP，所以我们很可能会达到IP配额限制。为了解决这个问题，我们只需使用docker image save -o /opt/preloaded_docker_images.tar和docker image load -i /opt/preloaded_docker_images.tar，在我们的Kubernetes工作者的机器映像中预装Docker镜像。为了提高性能，我们对常见的OpenAI内部image（如Dota image）的白名单也这样做。</p>
+<h2 id="Networking"><a href="#Networking" class="headerlink" title="Networking"></a>Networking</h2><p>随着我们的实验变得越来越大，它们也变得越来越复杂，分布式系统严重依赖网络进行操作。当我们第一次开始运行分布式实验时，很明显我们的网络配置不好。直接在机器之间我们获得了10-15Gbit / s的吞吐量，但我们使用flannel的Kube pod最大输出为~2Gbit / s。 Machine Zone公布的基准测试显示了类似的数字，这意味着问题可能不仅仅是错误的配置，而是我们环境固有的东西。 （相比之下，flannel不会在我们的物理机器上增加这种开销。）</p>
+<p>要解决此问题，用户可以添加两个不同的设置来为其pod禁用Flannel：hostNetwork：true和dnsPolicy：ClusterFirstWithHostNet。 （尽管在执行此操作之前，请阅读Kubernetes文档中的警告。）</p>
+<h2 id="ARP-Cache"><a href="#ARP-Cache" class="headerlink" title="ARP Cache"></a>ARP Cache</h2><p>尽管我们进行了DNS调整，但我们仍然看到了DNS解析的间歇性问题。有一天，一位工程师报告说，他们的Redis服务器的nc -v需要30秒才能打印出已建立的连接。我们将问题跟踪到内核的ARP堆栈。 Redis pod主机的初步调查显示网络存在严重错误：任何端口上的通信都挂了几秒钟，并且没有DNS名称可以通过本地dnsmasq守护进程解析，而dig只是打印一条神秘的失败消息：socket.c ：1915：internal_send：127.0.0.1＃53：Invalid argument。 dmesg日志提供了更多信息：邻居表溢出！这意味着ARP缓存空间不足。 ARP用于将诸如IPv4地址的网络地址映射到物理地址，例如MAC地址。幸运的是，通过在/etc/sysctl.conf中设置一些选项很容易解决这个问题：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">net.ipv4.neigh.default.gc_thresh1 = 80000</span><br><span class="line">net.ipv4.neigh.default.gc_thresh2 = 90000</span><br><span class="line">net.ipv4.neigh.default.gc_thresh3 = 100000</span><br></pre></td></tr></table></figure></p>
+<p>在HPC群集中调整此设置很常见，并且在Kubernetes群集中尤其相关，因为每个pod都有自己的IP地址，这会消耗ARP缓存中的空间。</p>
+<p>我们的Kubernetes集群现已无事故发生约3个月，我们计划在2018年扩展到更大的集群。我们最近升级到1.8.4版本，很高兴看到它现在正式支持5000节点。如果您对构建大型计算集群感兴趣，我们正在招聘！</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最終更新：<time datetime="2018-07-29T15:26:30.263Z" itemprop="dateUpdated">2018-07-29 23:26:30</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2018/07/29/scaling-kubernetes-to-2500-nodes/" target="_blank" rel="external">https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://cplo.github.io">
+            <img src="/assets/images/tuantuan.jpg" alt="Pengc">
+            Pengc
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kubernetes/">kubernetes</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻译/">翻译</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/&title=《拓展Kubernetes集群规模到2500节点》 — Pengc的博客&pic=https://cplo.github.io/assets/images/tuantuan.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/&title=《拓展Kubernetes集群规模到2500节点》 — Pengc的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《拓展Kubernetes集群规模到2500节点》 — Pengc的博客&url=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/&via=https://cplo.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/07/24/kubernetes-best-practices/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Kubernetes最佳实践</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+<section class="comments" id="comments">
+    <div id="disqus_thread"></div>
+    <script>
+    var disqus_shortname = 'true';
+    lazyScripts.push('//' + disqus_shortname + '.disqus.com/embed.js')
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>このブログの内容物は<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ja">クリエイティブ・コモンズ 表示 - 非営利 - 継承 4.0 国際ライセンスの下に提供されています</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Pengc &copy; 2015 - 2018</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/&title=《拓展Kubernetes集群规模到2500节点》 — Pengc的博客&pic=https://cplo.github.io/assets/images/tuantuan.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/&title=《拓展Kubernetes集群规模到2500节点》 — Pengc的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《拓展Kubernetes集群规模到2500节点》 — Pengc的博客&url=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/&via=https://cplo.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://cplo.github.io/2018/07/29/scaling-kubernetes-to-2500-nodes/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

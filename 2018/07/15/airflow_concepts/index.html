@@ -128,7 +128,7 @@
             <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
                 <i class="icon icon-lg icon-chevron-left"></i>
             </a>
-            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="Search">
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="検索">
             <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
                 <i class="icon icon-lg icon-search"></i>
             </a>
@@ -210,7 +210,7 @@
 <p>对于这种情况，您可以使用LatestOnlyOperator跳过在DAG的不在最近一次计划运行期间运行的任务。如果现在的时间不在其执行时间和下一个计划的执行时间之间，LatestOnlyOperator将跳过所有即时下游任务及其本身。</p>
 <p>必须注意跳过的任务和触发规则之间的交互。任务跳过将传递通过这些触发规则：all_success和all_failed，all_done，one_failed，one_success和dummy不传递。如果您想使用带有不会传递跳转的触发器规则的LatestOnlyOperator，则需要确保LatestOnlyOperator直接位于您要跳过的任务的上游。</p>
 <p>通过使用触发规则可以混合以典型的日期/时间依赖模式运行的任务和使用LatestOnlyOperator的任务。</p>
-<p>例如，请考虑以下dag：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#dags/latest_only_with_trigger.py</span><br><span class="line">import datetime as dt</span><br><span class="line"></span><br><span class="line">from airflow.models import DAG</span><br><span class="line">from airflow.operators.dummy_operator import DummyOperator</span><br><span class="line">from airflow.operators.latest_only_operator import LatestOnlyOperator</span><br><span class="line">from airflow.utils.trigger_rule import TriggerRule</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dag = DAG(</span><br><span class="line">    dag_id=&apos;latest_only_with_trigger&apos;,</span><br><span class="line">    schedule_interval=dt.timedelta(hours=4),</span><br><span class="line">    start_date=dt.datetime(2016, 9, 20),</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">latest_only = LatestOnlyOperator(task_id=&apos;latest_only&apos;, dag=dag)</span><br><span class="line"></span><br><span class="line">task1 = DummyOperator(task_id=&apos;task1&apos;, dag=dag)</span><br><span class="line">task1.set_upstream(latest_only)</span><br><span class="line"></span><br><span class="line">task2 = DummyOperator(task_id=&apos;task2&apos;, dag=dag)</span><br><span class="line"></span><br><span class="line">task3 = DummyOperator(task_id=&apos;task3&apos;, dag=dag)</span><br><span class="line">task3.set_upstream([task1, task2])</span><br><span class="line"></span><br><span class="line">task4 = DummyOperator(task_id=&apos;task4&apos;, dag=dag,</span><br><span class="line">                      trigger_rule=TriggerRule.ALL_DONE)</span><br><span class="line">task4.set_upstream([task1, task2])</span><br></pre></td></tr></table></figure></p>
+<p>例如，请考虑以下dag：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#dags/latest_only_with_trigger.py</span><br><span class="line">import datetime as dt</span><br><span class="line"></span><br><span class="line">from airflow.models import DAG</span><br><span class="line">from airflow.operators.dummy_operator import DummyOperator</span><br><span class="line">from airflow.operators.latest_only_operator import LatestOnlyOperator</span><br><span class="line">from airflow.utils.trigger_rule import TriggerRule</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dag = DAG(</span><br><span class="line">    dag_id=&apos;latest_only_with_trigger&apos;,</span><br><span class="line">    schedule_interval=dt.timedelta(hours=4),</span><br><span class="line">    start_date=dt.datetime(2016, 9, 20),</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">latest_only = LatestOnlyOperator(task_id=&apos;latest_only&apos;, dag=dag)</span><br><span class="line"></span><br><span class="line">task1 = DummyOperator(task_id=&apos;task1&apos;, dag=dag)</span><br><span class="line">task1.set_upstream(latest_only)</span><br><span class="line"></span><br><span class="line">task2 = DummyOperator(task_id=&apos;task2&apos;, dag=dag)</span><br><span class="line"></span><br><span class="line">task3 = DummyOperator(task_id=&apos;task3&apos;, dag=dag)</span><br><span class="line">task3.set_upstream([task1, task2])</span><br><span class="line"></span><br><span class="line">task4 = DummyOperator(task_id=&apos;task4&apos;, dag=dag,</span><br><span class="line">                      trigger_rule=TriggerRule.ALL_DONE)</span><br><span class="line">task4.set_upstream([task1, task2])</span><br></pre></td></tr></table></figure></p>
 <p>在这个dag的情况下，latest_only任务将把除最近运行以外的所有运行显示为跳过的状态。 task1直接位于latest_only的下游，并且也会跳过除最新版本之外的所有运行。 task2完全独立于latest_only，并将在所有预定时段运行。 task3位于task1和task2的下游，并且由于默认的trigger_rule为all_success，因此将从task1接收传递跳过。 task4位于task1和task2的下游，但由于其trigger_rule设置为all_done，只要task1被跳过（一个有效的完成状态）并且task2成功，它就会立即触发。</p>
 <p><img src="https://airflow.apache.org/_images/latest_only_with_trigger.png" alt="image"></p>
 <p><a href="https://airflow.apache.org/concepts.html" target="_blank" rel="noopener">原文链接</a></p>
@@ -222,7 +222,7 @@
     <div class="content">
         
 <span class="post-time">
-    Last updated: <time datetime="2018-07-15T07:52:28.811Z" itemprop="dateUpdated">2018-07-15 15:52:28</time>
+    最終更新：<time datetime="2018-07-15T07:52:28.811Z" itemprop="dateUpdated">2018-07-15 15:52:28</time>
 </span><br>
 
 
@@ -371,7 +371,7 @@
             
                 <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
             
-            <span>This blog is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</span>
+            <span>このブログの内容物は<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ja">クリエイティブ・コモンズ 表示 - 非営利 - 継承 4.0 国際ライセンスの下に提供されています</a></span>
         </p>
     </div>
     <div class="bottom">
