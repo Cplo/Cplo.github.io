@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>链表逆置的golang实现 | Pengc的博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="golang,algorithm">
+    <meta name="description" content="最近在追数据结构与算法之美专栏，准备需要code的章节用golang实现一遍，以便学习算法的同时提升golang的姿势水平。  golang版本链表逆置package mainimport (	&quot;fmt&quot;)type Node struct &amp;#123;	data int	next *Node&amp;#125;func (r *Node) addNode(i int) &amp;#123;	node := Nod">
+<meta name="keywords" content="golang,algorithm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="链表逆置的golang实现">
+<meta property="og:url" content="https://cplo.github.io/2018/10/05/linklist-algorithm/index.html">
+<meta property="og:site_name" content="Pengc的博客">
+<meta property="og:description" content="最近在追数据结构与算法之美专栏，准备需要code的章节用golang实现一遍，以便学习算法的同时提升golang的姿势水平。  golang版本链表逆置package mainimport (	&quot;fmt&quot;)type Node struct &amp;#123;	data int	next *Node&amp;#125;func (r *Node) addNode(i int) &amp;#123;	node := Nod">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-05T07:51:11.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="链表逆置的golang实现">
+<meta name="twitter:description" content="最近在追数据结构与算法之美专栏，准备需要code的章节用golang实现一遍，以便学习算法的同时提升golang的姿势水平。  golang版本链表逆置package mainimport (	&quot;fmt&quot;)type Node struct &amp;#123;	data int	next *Node&amp;#125;func (r *Node) addNode(i int) &amp;#123;	node := Nod">
+    
+        <link rel="alternate" type="application/atom+xml" title="Pengc的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/assets/images/tuantuan.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Pengc</h5>
+          <a href="mailto:dev_chenpeng@163.com" title="dev_chenpeng@163.com" class="mail">dev_chenpeng@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Cplo" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-link"></i>
+                About
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">链表逆置的golang实现</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="Search">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">链表逆置的golang实现</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-10-05T07:45:41.000Z" itemprop="datePublished" class="page-time">
+  2018-10-05
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Golang/">Golang</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+
+<article id="post-linklist-algorithm"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">链表逆置的golang实现</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-10-05 15:45:41" datetime="2018-10-05T07:45:41.000Z"  itemprop="datePublished">2018-10-05</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Golang/">Golang</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>最近在追数据结构与算法之美专栏，准备需要code的章节用golang实现一遍，以便学习算法的同时提升golang的姿势水平。</p>
+<ul>
+<li>golang版本链表逆置<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Node <span class="keyword">struct</span> &#123;</span><br><span class="line">	data <span class="keyword">int</span></span><br><span class="line">	next *Node</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Node)</span> <span class="title">addNode</span><span class="params">(i <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">	node := Node&#123;</span><br><span class="line">		data: i,</span><br><span class="line">		next: <span class="literal">nil</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	node.next = r.next</span><br><span class="line">	r.next = &amp;node</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(n *Node)</span> <span class="title">reverseNodes</span><span class="params">()</span></span> &#123;</span><br><span class="line">	p := n.next</span><br><span class="line">	<span class="keyword">if</span> p != <span class="literal">nil</span> &#123;</span><br><span class="line">		q := p.next</span><br><span class="line">		p.next = <span class="literal">nil</span></span><br><span class="line">		<span class="keyword">for</span>; q != <span class="literal">nil</span>; &#123;</span><br><span class="line">			r := q.next</span><br><span class="line">			q.next = p</span><br><span class="line">			p = q</span><br><span class="line">			q = r</span><br><span class="line">		&#125;</span><br><span class="line">		n.next = p</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Node)</span> <span class="title">print</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> r.next != <span class="literal">nil</span> &#123;</span><br><span class="line">		r = r.next</span><br><span class="line">		fmt.Printf(<span class="string">"%d "</span>, r.data)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *Node)</span> <span class="title">findMiddleNode</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> r.next != <span class="literal">nil</span> &#123;</span><br><span class="line">		p := r.next</span><br><span class="line">		<span class="keyword">if</span> p != <span class="literal">nil</span> &#123;</span><br><span class="line">			q := p.next</span><br><span class="line">			<span class="keyword">for</span> &#123;</span><br><span class="line">				<span class="keyword">if</span> q != <span class="literal">nil</span> &amp;&amp; q.next != <span class="literal">nil</span> &#123;</span><br><span class="line">					q = q.next.next</span><br><span class="line">					p = p.next</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					<span class="keyword">break</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			fmt.Println(p.data)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	rootNode := Node&#123;</span><br><span class="line">		data: <span class="number">-1</span>,</span><br><span class="line">		next: <span class="literal">nil</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	root := &amp;rootNode</span><br><span class="line">	root.addNode(<span class="number">1</span>)</span><br><span class="line">	root.addNode(<span class="number">2</span>)</span><br><span class="line">	root.addNode(<span class="number">3</span>)</span><br><span class="line">	root.addNode(<span class="number">4</span>)</span><br><span class="line">	root.addNode(<span class="number">5</span>)</span><br><span class="line">	root.addNode(<span class="number">6</span>)</span><br><span class="line">	root.reverseNodes()</span><br><span class="line">	root.<span class="built_in">print</span>()</span><br><span class="line">	root.findMiddleNode()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    Last updated: <time datetime="2018-10-05T07:51:11.269Z" itemprop="dateUpdated">2018-10-05 15:51:11</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2018/10/05/linklist-algorithm/" target="_blank" rel="external">https://cplo.github.io/2018/10/05/linklist-algorithm/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://cplo.github.io">
+            <img src="/assets/images/tuantuan.jpg" alt="Pengc">
+            Pengc
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/algorithm/">algorithm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://cplo.github.io/2018/10/05/linklist-algorithm/&title=《链表逆置的golang实现》 — Pengc的博客&pic=https://cplo.github.io/assets/images/tuantuan.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://cplo.github.io/2018/10/05/linklist-algorithm/&title=《链表逆置的golang实现》 — Pengc的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://cplo.github.io/2018/10/05/linklist-algorithm/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《链表逆置的golang实现》 — Pengc的博客&url=https://cplo.github.io/2018/10/05/linklist-algorithm/&via=https://cplo.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://cplo.github.io/2018/10/05/linklist-algorithm/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/07/29/scaling-kubernetes-to-2500-nodes/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">拓展Kubernetes集群规模到2500节点</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+<section class="comments" id="comments">
+    <div id="disqus_thread"></div>
+    <script>
+    var disqus_shortname = 'true';
+    lazyScripts.push('//' + disqus_shortname + '.disqus.com/embed.js')
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>This blog is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Pengc &copy; 2015 - 2018</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://cplo.github.io/2018/10/05/linklist-algorithm/&title=《链表逆置的golang实现》 — Pengc的博客&pic=https://cplo.github.io/assets/images/tuantuan.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://cplo.github.io/2018/10/05/linklist-algorithm/&title=《链表逆置的golang实现》 — Pengc的博客&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://cplo.github.io/2018/10/05/linklist-algorithm/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《链表逆置的golang实现》 — Pengc的博客&url=https://cplo.github.io/2018/10/05/linklist-algorithm/&via=https://cplo.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://cplo.github.io/2018/10/05/linklist-algorithm/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=https://cplo.github.io/2018/10/05/linklist-algorithm/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
